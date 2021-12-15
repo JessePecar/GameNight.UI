@@ -1,0 +1,43 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="GameNight.UI.Views.Games.TableTopView">
+    <ContentPage.Content>
+        <StackLayout Padding="3">
+            <Label Text="{Binding LobbyCode}" HorizontalOptions="Center" FontSize="Subtitle" Margin="0,0,0,15"></Label>
+
+            <StackLayout Orientation="Horizontal" Margin="0,0,0,15">
+                <Label Text="Number of Dice:" VerticalOptions="Center" ></Label>
+                <Entry Text="{Binding NumberOfDice}" Keyboard="Numeric" WidthRequest="80" MinimumWidthRequest="80"></Entry>
+                <Picker ItemsSource="{Binding DiceTypes}" SelectedItem="{Binding SelectedDiceType}" WidthRequest="80" MinimumWidthRequest="80"></Picker>
+                <Button Command="{Binding SubmitForRoll}" Text="Roll!"></Button>
+            </StackLayout>
+
+            <ListView x:Name="lv_ListView" ItemsSource="{Binding TurnLogs}" VerticalOptions="FillAndExpand" 
+                      HasUnevenRows="True" SelectionMode="None" SelectedItem="{Binding LastLog}" SeparatorColor="Transparent" >
+                <ListView.ItemTemplate>
+                    <DataTemplate>
+                        <ViewCell>
+                            <StackLayout Orientation="Vertical" Padding="5,0,5,1">
+                                <StackLayout HorizontalOptions="End" IsVisible="{Binding IsPlayer}">
+                                    <Label HorizontalOptions="EndAndExpand" Text="{Binding User}"></Label>
+                                    <Frame CornerRadius="25" BackgroundColor="CadetBlue">
+                                        <Label HorizontalOptions="FillAndExpand" TextColor="White" Padding="2,0,2,0" Text="{Binding TurnResult}"></Label>
+                                    </Frame>
+                                </StackLayout>
+
+                                <StackLayout HorizontalOptions="Start" IsVisible="{Binding IsNotPlayer}">
+                                    <Label HorizontalOptions="StartAndExpand" Text="{Binding User}"></Label>
+                                    <Frame CornerRadius="25" BackgroundColor="Green">
+                                        <Label HorizontalOptions="FillAndExpand" TextColor="White" Padding="2,0,2,0" Text="{Binding TurnResult}"></Label>
+                                    </Frame>
+                                </StackLayout>
+                            </StackLayout>
+                        </ViewCell>
+                    </DataTemplate>
+                </ListView.ItemTemplate>
+            </ListView>
+
+        </StackLayout>
+    </ContentPage.Content>
+</ContentPage>
