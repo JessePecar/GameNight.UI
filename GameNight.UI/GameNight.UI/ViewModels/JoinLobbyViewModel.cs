@@ -93,27 +93,24 @@ namespace GameNight.UI.ViewModels
         {
             DependencyManager.Resolve<IHubClient>().SetupHandlerForViewModel((conn) =>
             {
-                return () =>
+                conn.On<GameType>("GameJoinedSuccessfully", async (gameType) =>
                 {
-                    conn.On<GameType>("GameJoinedSuccessfully", async (gameType) =>
+                    switch (gameType)
                     {
-                        switch (response.GameType)
-                        {
-                            case (GameType.TableTopRPG):
-                                TableTopView.ReinstateView(new TableTopViewModel(LobbyKey, UserName));
-                                await DependencyManager.PushNavigation(GameView.View);
-                                break;
-                            case (GameType.ChooseOne):
-                                ChooseOneView.ReinstateView(new ChooseOneViewModel(LobbyKey, UserName));
-                                await DependencyManager.PushNavigation(ChooseOneView.View);
-                                break;
-                            default:
-                                TableTopView.ReinstateView(new TableTopViewModel(LobbyKey, UserName));
-                                await DependencyManager.PushNavigation(TableTopView.View);
-                                break;
-                        }
-                    });
-                };
+                        case (GameType.TableTopRPG):
+                            TableTopView.ReinstateView(new TableTopViewModel(LobbyKey, UserName));
+                            await DependencyManager.PushNavigation(GameView.View);
+                            break;
+                        case (GameType.ChooseOne):
+                            ChooseOneView.ReinstateView(new ChooseOneViewModel(LobbyKey, UserName));
+                            await DependencyManager.PushNavigation(ChooseOneView.View);
+                            break;
+                        default:
+                            TableTopView.ReinstateView(new TableTopViewModel(LobbyKey, UserName));
+                            await DependencyManager.PushNavigation(TableTopView.View);
+                            break;
+                    }
+                });
             });
 
             GameView.ReinstateView(new GameViewModel(LobbyKey, UserName));

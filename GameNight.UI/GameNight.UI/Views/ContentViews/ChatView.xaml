@@ -1,0 +1,31 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<ContentView xmlns="http://xamarin.com/schemas/2014/forms" 
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="GameNight.UI.Views.ContentViews.ChatView">
+  <ContentView.Content>
+        <ListView x:Name="lv_ListView" ItemsSource="{Binding TurnLogs}" VerticalOptions="FillAndExpand" 
+                      HasUnevenRows="True" SelectionMode="None" SelectedItem="{Binding LastLog}" SeparatorColor="Transparent" >
+            <ListView.ItemTemplate>
+                <DataTemplate>
+                    <ViewCell>
+                        <StackLayout Orientation="Vertical" Padding="5,0,5,1">
+                            <StackLayout HorizontalOptions="End" IsVisible="{Binding IsPlayer}">
+                                <Label HorizontalOptions="EndAndExpand" Text="{Binding User}"></Label>
+                                <Frame CornerRadius="25" BackgroundColor="CadetBlue">
+                                    <Label HorizontalOptions="FillAndExpand" TextColor="White" Padding="2,0,2,0" Text="{Binding TurnResult}"></Label>
+                                </Frame>
+                            </StackLayout>
+
+                            <StackLayout HorizontalOptions="Start" IsVisible="{Binding IsNotPlayer}">
+                                <Label HorizontalOptions="StartAndExpand" Text="{Binding User}"></Label>
+                                <Frame CornerRadius="25" BackgroundColor="Green">
+                                    <Label HorizontalOptions="FillAndExpand" TextColor="White" Padding="2,0,2,0" Text="{Binding TurnResult}"></Label>
+                                </Frame>
+                            </StackLayout>
+                        </StackLayout>
+                    </ViewCell>
+                </DataTemplate>
+            </ListView.ItemTemplate>
+        </ListView>
+    </ContentView.Content>
+</ContentView>

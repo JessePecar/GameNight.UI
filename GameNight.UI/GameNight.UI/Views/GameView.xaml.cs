@@ -15,7 +15,6 @@ namespace GameNight.UI.Views
             _view = this;
             _view.InitializeComponent();
             _view.SetViewModel(viewModel);
-            viewModel.ScrollToBottom = () => ScrollToBottom();
             _view.BindingContext = _viewModel;
         }
 
@@ -28,9 +27,5 @@ namespace GameNight.UI.Views
 
         public static GameView View => _view;
 
-        private void ScrollToBottom()
-        {
-            lv_ListView.ScrollTo(_viewModel.TurnLogs.LastOrDefault(), ScrollToPosition.End, true);
-        }
     }
 }

@@ -20,24 +20,24 @@ namespace GameNight.UI.HubClient
                 .WithAutomaticReconnect(new[] { TimeSpan.Zero, TimeSpan.Zero, TimeSpan.FromSeconds(10) })
                 .Build();
 
-            Task.Run(async () => await connection.StartAsync()).ContinueWith((tsk) =>
+            Task.Run(async () => await connection.StartAsync()).ContinueWith(async (tsk) =>
             {
-                ConfigureHandler();
+                await ConfigureHandler();
             });
         }
 
-        private void ConfigureHandler()
+        private async Task ConfigureHandler()
         {
-            connection.On("InvalidGameRequest", () =>
+            connection.On("InvalidGameRequest", async () =>
             {
                 //Handle Invalid Game Requests
-                App.Current.MainPage.DisplayAlert("Error", "You have submitted an invalid game request", "OK");
+                await App.Current.MainPage.DisplayAlert("Error", "You have submitted an invalid game request", "OK");
             });
         }
 
-        public void SetupHandlerForViewModel(Func<HubConnection, Action> handler)
+        public void SetupHandlerForViewModel(Action<HubConnection> handler)
         {
-            handler(connection);
+            handler.Invoke(connection);
         }
 
         public async Task JoinGame(string lobbyKey, string password, string userName, Guid? adminKey = null)
@@ -48,7 +48,7 @@ namespace GameNight.UI.HubClient
                 {
                     await connection.StartAsync();
                 }
-                await connection.InvokeAsync("JoinGame", lobbyKey, password, userName, adminKey);
+                await connection.InvokeAsync("JoinGame", lobbyKey, password, userName, App.DeviceKey, adminKey);
             }
             catch (Exception ex)
             {
@@ -58,12 +58,12 @@ namespace GameNight.UI.HubClient
 
         public async Task LeaveGame(string lobbyKey)
         {
-            await connection.InvokeAsync("LeaveGame", lobbyKey);
+            await connection.InvokeAsync("LeaveGame", lobbyKey, App.DeviceKey);
         }
 
         public async Task LeaveAllGames()
         {
-            await connection.InvokeAsync(nameof(LeaveAllGames));
+            await connection.InvokeAsync(nameof(LeaveAllGames), App.DeviceKey);
         }
 
         public void NextTurn(string lobbyKey)

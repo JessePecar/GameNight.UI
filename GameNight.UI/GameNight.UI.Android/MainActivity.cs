@@ -31,7 +31,7 @@ namespace GameNight.UI.Droid
         {
             base.Finish();
 
-            DependencyManager.Resolve<IHubClient>();
+            DependencyManager.Resolve<IHubClient>().LeaveAllGames();
         }
     }
 }

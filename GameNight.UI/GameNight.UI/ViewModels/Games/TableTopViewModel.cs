@@ -13,6 +13,8 @@ using System.Threading.Tasks;
 using System.Windows.Input;
 using Xamarin.Forms;
 using System.Linq;
+using GameNight.UI.ViewModels.ContentViewModels;
+using GameNight.UI.Views.ContentViews;
 
 namespace GameNight.UI.ViewModels.Games
 {
@@ -24,14 +26,17 @@ namespace GameNight.UI.ViewModels.Games
             _userName = userName;
             _adminKey = adminKey;
 
-            TurnLogs = new ObservableCollection<TurnLog>();
             PopulateCurrentDice();
 
             DependencyManager.Resolve<IHubClient>().SetupHandlerForViewModel(conn =>
             {
-                return () => conn.On<string, DiceResult>("SendDetails", (user, result) => AddTurnLog(user, result));
+                conn.On<string, DiceResult>("SendDetails", (user, result) => AddTurnLog(user, result));
             });
+
             SubmitForRoll = new Command(async () => await RollDice(), () => CanExecute);
+
+            ChatViewModel = new ChatViewModel();
+            ChatLogView = new ChatView(ChatViewModel);
 
             CanExecute = true;
         }
@@ -57,18 +62,7 @@ namespace GameNight.UI.ViewModels.Games
             get => _adminKey;
         }
 
-        private ObservableCollection<TurnLog> _turnLogs;
-        public ObservableCollection<TurnLog> TurnLogs
-        {
-            get => _turnLogs;
-            set
-            {
-                _turnLogs = value;
-                RaisePropertyChange();
-            }
-        }
-
-        private ObservableCollection<DiceType> _diceTypes;
+        private ObservableCollection<DiceType> _diceTypes = new ObservableCollection<DiceType>();
         public ObservableCollection<DiceType> DiceTypes
         {
             get => _diceTypes;
@@ -121,6 +115,29 @@ namespace GameNight.UI.ViewModels.Games
             }
         }
 
+        private ChatViewModel _chatViewModel;
+        public ChatViewModel ChatViewModel
+        {
+            get => _chatViewModel;
+            set
+            {
+                if (value == null) return;
+                _chatViewModel = value;
+                RaisePropertyChange();
+            }
+        }
+
+        private ContentView _chatLogView;
+        public ContentView ChatLogView
+        {
+            get => _chatLogView;
+            set
+            {
+                if (value == null) return;
+                _chatLogView = value;
+                RaisePropertyChange();
+            }
+        }
         protected override bool CanExecute
         {
             set
@@ -131,34 +148,18 @@ namespace GameNight.UI.ViewModels.Games
             }
         }
 
-        private Action _scrollToBottom;
-        public Action ScrollToBottom
-        {
-            get => _scrollToBottom;
-            set
-            {
-                if (value == null) return;
-                _scrollToBottom = value;
-                RaisePropertyChange();
-            }
-        }
         #endregion
 
         #region Public Methods
 
         public void AddTurnLog(string user, DiceResult result)
         {
-            List<TurnLog> turns = TurnLogs.ToList();
+            ChatViewModel.AddTurnLog(
+                user, 
+                user.Equals(UserName, StringComparison.OrdinalIgnoreCase), 
+                $"Rolled {result.RollCount} {result.Type.ToString()} for: {Environment.NewLine} {string.Join(", ", result.Rolls.Select(r => r.ToString()))}");
 
-            turns.Add(new TurnLog
-            {
-                User = user,
-                TurnResult = $"Rolled {result.RollCount} {result.Type.ToString()} for: {Environment.NewLine} {string.Join(", ", result.Rolls.Select(r => r.ToString()))}",
-                IsPlayer = user.Equals(UserName, StringComparison.OrdinalIgnoreCase)
-            });
-
-            TurnLogs = new ObservableCollection<TurnLog>(turns);
-            ScrollToBottom?.Invoke();
+            RaisePropertyChange(nameof(ChatViewModel));
         }
 
         #endregion

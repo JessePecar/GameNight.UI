@@ -7,6 +7,7 @@ using GameNight.UI.Views;
 using GameNight.UI.Views.Games;
 using Microsoft.AspNetCore.SignalR.Client;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Input;
@@ -78,36 +79,45 @@ namespace GameNight.UI.ViewModels
             CanExecute = true;
         }
 
+        private Dictionary<int, GameType> GetEnumDictionary()
+        {
+            return Enum.GetValues(typeof(GameType)).Cast<GameType>().Select(gt => ((int)gt, gt)).ToDictionary(d => d.Item1, d => d.gt);
+
+        }
         private async Task CreateNewGame()
         {
+            if (string.IsNullOrWhiteSpace(UserName) || string.IsNullOrWhiteSpace(Password))
+            {
+                await App.Current.MainPage.DisplayAlert("Error", "Invalid information entered", "Ok");
+                return;
+            }
+
             GameManager response = await DependencyManager.Resolve<GameController>().InitializeNewGame(Password);
 
             if (response != null)
             {
                 DependencyManager.Resolve<IHubClient>().SetupHandlerForViewModel((conn) =>
                 {
-                    return () =>
+                    conn.On<int>("GameJoinedSuccessfully", async (gameTypeId) =>
                     {
-                        conn.On<GameType>("GameJoinedSuccessfully", async (gameType) =>
+                        GameType gameType = GetEnumDictionary().GetValueOrDefault(gameTypeId);
+                        switch (gameType)
                         {
-                            switch (gameType)
-                            {
-                                case (GameType.TableTopRPG):
-                                    TableTopView.ReinstateView(new TableTopViewModel(response.LobbyKey, UserName, response.AdminKey));
-                                    await DependencyManager.PushNavigation(GameView.View);
-                                    break;
-                                case(GameType.ChooseOne):
-                                    GameView.ReinstateView(new GameViewModel(response.LobbyKey, UserName, response.AdminKey));
-                                    await DependencyManager.PushNavigation(GameView.View);
-                                    break;
-                                default:
-                                    TableTopView.ReinstateView(new TableTopViewModel(response.LobbyKey, UserName, response.AdminKey));
-                                    await DependencyManager.PushNavigation(TableTopView.View);
-                                    break;
-                            }
-                            
-                        });
-                    };
+                            case (GameType.TableTopRPG):
+                                TableTopView.ReinstateView(new TableTopViewModel(response.LobbyKey, UserName, response.AdminKey));
+                                await DependencyManager.PushNavigation(TableTopView.View);
+                                break;
+                            case (GameType.ChooseOne):
+                                GameView.ReinstateView(new GameViewModel(response.LobbyKey, UserName, response.AdminKey));
+                                await DependencyManager.PushNavigation(GameView.View);
+                                break;
+                            default:
+                                TableTopView.ReinstateView(new TableTopViewModel(response.LobbyKey, UserName, response.AdminKey));
+                                await DependencyManager.PushNavigation(TableTopView.View);
+                                break;
+                        }
+
+                    });
                 });
 
                 await DependencyManager.Resolve<IHubClient>().JoinGame(response.LobbyKey, Password, UserName);

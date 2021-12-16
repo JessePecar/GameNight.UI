@@ -11,13 +11,13 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.AspNetCore.SignalR.Client" Version="6.0.0" />
-    <PackageReference Include="Microsoft.AspNetCore.SignalR.Client.Core" Version="6.0.0" />
-    <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
-    <PackageReference Include="Unity" Version="5.11.10" />
-    <PackageReference Include="Unity.Microsoft.DependencyInjection" Version="5.11.5" />
-    <PackageReference Include="Xamarin.Forms" Version="5.0.0.2244" />
-    <PackageReference Include="Xamarin.Essentials" Version="1.7.0" />
+	  <PackageReference Include="Microsoft.AspNetCore.SignalR.Client" Version="6.0.0" />
+	  <PackageReference Include="Microsoft.AspNetCore.SignalR.Client.Core" Version="6.0.0" />
+	  <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
+	  <PackageReference Include="Unity" Version="5.11.10" />
+	  <PackageReference Include="Unity.Microsoft.DependencyInjection" Version="5.11.5" />
+	  <PackageReference Include="Xamarin.Forms" Version="5.0.0.2244" />
+	  <PackageReference Include="Xamarin.Essentials" Version="1.7.0" />
   </ItemGroup>
 
   <ItemGroup>
@@ -31,6 +31,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <EmbeddedResource Update="Views\ContentViews\ChatView.xaml">
+      <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
+    </EmbeddedResource>
     <EmbeddedResource Update="Views\Games\ChooseOneView.xaml">
       <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
     </EmbeddedResource>

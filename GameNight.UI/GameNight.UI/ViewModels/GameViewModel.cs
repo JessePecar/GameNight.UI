@@ -27,10 +27,6 @@ namespace GameNight.UI.ViewModels
             TurnLogs = new ObservableCollection<TurnLog>();
             PopulateCurrentDice();
 
-            DependencyManager.Resolve<IHubClient>().SetupHandlerForViewModel(conn =>
-            {
-                return () => conn.On<string, DiceResult>("SendDetails", (user, result) => AddTurnLog(user, result));
-            });
             SubmitForRoll = new Command(async () => await RollDice(), () => CanExecute);
 
             CanExecute = true;
@@ -129,35 +125,10 @@ namespace GameNight.UI.ViewModels
             }
         }
 
-        private Action _scrollToBottom;
-        public Action ScrollToBottom
-        {
-            get => _scrollToBottom;
-            set
-            {
-                if (value == null) return;
-                _scrollToBottom = value;
-                RaisePropertyChange();
-            }
-        }
         #endregion
 
         #region Public Methods
 
-        public void AddTurnLog(string user, DiceResult result)
-        {
-            List<TurnLog> turns = TurnLogs.ToList();
-
-            turns.Add(new TurnLog
-            {
-                User = user,
-                TurnResult = $"Rolled {result.RollCount} {result.Type.ToString()} for: {Environment.NewLine} {string.Join(", ", result.Rolls.Select(r => r.ToString()))}",
-                IsPlayer = user.Equals(UserName, StringComparison.OrdinalIgnoreCase)
-            });
-
-            TurnLogs = new ObservableCollection<TurnLog>(turns);
-            ScrollToBottom?.Invoke();
-        }
 
         #endregion
 
@@ -168,8 +139,6 @@ namespace GameNight.UI.ViewModels
             DiceResult result = await DependencyManager.Resolve<DiceController>().DndRoll(int.Parse(NumberOfDice), SelectedDiceType);
 
             await DependencyManager.Resolve<IHubClient>().SendPlayersDetails(LobbyCode, UserName, result);
-
-            AddTurnLog(UserName, result);
         }
 
         private void PopulateCurrentDice()

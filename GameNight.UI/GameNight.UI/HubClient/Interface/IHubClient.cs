@@ -23,7 +23,7 @@ namespace GameNight.UI.HubClient.Interface
 
         void UpdateScore(string lobbyKey, string userName);
 
-        void SetupHandlerForViewModel(Func<HubConnection, Action> handler);
+        void SetupHandlerForViewModel(Action<HubConnection> handler);
 
         Task LeaveAllGames();
     }

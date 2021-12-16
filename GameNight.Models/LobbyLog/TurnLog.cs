@@ -1,10 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace GameNight.Models.LobbyLog
+﻿namespace GameNight.Models.LobbyLog
 {
-    public class TurnLog
+    public class ChatLog
     {
         public string User { get; set; }
         public string TurnResult { get; set; }
